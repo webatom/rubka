@@ -15,6 +15,9 @@ const siteElementSchema = new mongoose.Schema({
     ref: 'Site'
   }
 }, {
+  toObject: {
+    virtuals: true
+  }
   /* @see mongoose
   toObject: {
     transform(doc, ret) {
