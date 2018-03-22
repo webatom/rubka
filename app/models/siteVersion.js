@@ -19,6 +19,9 @@ const siteVersionSchema = new mongoose.Schema({
     ref: 'Site'
   }
 }, {
+  toObject: {
+    virtuals: true
+  }
   // timestamps: true
   /* @see mongoose
   toObject: {

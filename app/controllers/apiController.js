@@ -88,6 +88,20 @@ async function getSiteElementsBySite(ctx, next) {
   await next();
 }
 
+// async function saveSiteElements(ctx, next) {
+//   if (!mongoose.Types.ObjectId.isValid(ctx.params.siteId)) {
+//     ctx.throw(404);
+//   }
+//   let siteElements = await Site.findById(ctx.params.siteId).populate('siteElements');
+
+//   if (!siteElements) {
+//     ctx.throw(404);
+//   }
+
+//   await siteElements.map(se => se.remove());
+
+// }
+
 // ============== SITE VERSIONS ====================
 async function loadSiteVersionById(ctx) {
   if (!mongoose.Types.ObjectId.isValid(ctx.params.siteVersionId)) {
