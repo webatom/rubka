@@ -88,19 +88,43 @@ async function getSiteElementsBySite(ctx, next) {
   await next();
 }
 
-// async function saveSiteElements(ctx, next) {
-//   if (!mongoose.Types.ObjectId.isValid(ctx.params.siteId)) {
-//     ctx.throw(404);
-//   }
-//   let siteElements = await Site.findById(ctx.params.siteId).populate('siteElements');
+async function saveSiteElements(ctx, next) {
+  if (!mongoose.Types.ObjectId.isValid(ctx.params.siteId)) {
+    ctx.throw(404);
+  }
+  let siteWithElements = await Site.findById(ctx.params.siteId).populate('siteElements');
+  let siteElements = await siteWithElements.toJSON().siteElements;
 
-//   if (!siteElements) {
-//     ctx.throw(404);
-//   }
+  if (!siteWithElements) {
+    ctx.throw(404);
+  }
 
-//   await siteElements.map(se => se.remove());
+  let inputElements = ctx.request.body;
 
-// }
+  for (let i = 0; i < siteElements.length; i++) {
+    for (let j = 0; j < inputElements.length; j++) {
+      if (siteElements[i].id === inputElements[j].id) {
+        // console.log(inputElements[j]);
+        // console.log(siteElements[i]);
+        let tmp = await SiteElement.findById(siteElements[i].id);
+        Object.assign(tmp, pick(inputElements[j], SiteElement.publicFields));
+        // console.log(tmp);
+        await tmp.save();
+        await inputElements.splice(j, 1);
+        break;
+      }
+    }
+  }
+
+  for (let i = 0; i < inputElements.length; i++) {
+    console.log(inputElements[i]);
+    await SiteElement.create(pick(inputElements[i], SiteElement.publicFields));
+  }
+
+  ctx.status = 201;
+  // await siteElements.map(se => se.remove());
+  await next();
+}
 
 // ============== SITE VERSIONS ====================
 async function loadSiteVersionById(ctx) {
@@ -197,4 +221,4 @@ async function removeSiteElement(ctx, next) {
   await next();
 }
 
-module.exports = {getAllSites, getSiteById, createSite, updateSite, removeSite, getSiteVersionsBySite, getSiteElementsBySite, getAllSiteVersions, getSiteVersionById, createSiteVersion, updateSiteVersion, removeSiteVersion, getAllSiteElements, getSiteElementById, createSiteElement, updateSiteElement, removeSiteElement};
+module.exports = {getAllSites, getSiteById, createSite, updateSite, removeSite, getSiteVersionsBySite, getSiteElementsBySite, getAllSiteVersions, getSiteVersionById, createSiteVersion, updateSiteVersion, removeSiteVersion, getAllSiteElements, getSiteElementById, createSiteElement, updateSiteElement, removeSiteElement, saveSiteElements};

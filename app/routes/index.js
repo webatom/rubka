@@ -2,7 +2,7 @@ const Router = require('koa-router');
 const KoaBody = require('koa-body');
 const {getAllSites, getSiteById, createSite, updateSite, removeSite, getSiteVersionsBySite, getSiteElementsBySite,
   getAllSiteVersions, getSiteVersionById, createSiteVersion, updateSiteVersion, removeSiteVersion,
-  getAllSiteElements, getSiteElementById, createSiteElement, updateSiteElement, removeSiteElement } =
+  getAllSiteElements, getSiteElementById, createSiteElement, updateSiteElement, removeSiteElement, saveSiteElements } =
   require('../controllers/apiController');
 
 const router = new Router({
@@ -18,7 +18,7 @@ router
   .delete('/sites/:siteId',                   removeSite)
   .get('/sites/:siteId/siteVersions',         KoaBody(), getSiteVersionsBySite)
   .get('/sites/:siteId/siteElements',         KoaBody(), getSiteElementsBySite)
-  // .post('/sites/:siteId/siteElements',        KoaBody(), saveSiteElements)
+  .post('/sites/:siteId/saveSiteElements/',    KoaBody(), saveSiteElements)
   // site versions
   .get('/siteVersions',                       getAllSiteVersions)
   .get('/siteVersions/:siteVersionId',        getSiteVersionById)
