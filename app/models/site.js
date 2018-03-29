@@ -18,6 +18,9 @@ const siteSchema = new mongoose.Schema({
     type: String,
     required: 'У сайта должно быть название'
   },
+  yaMetrikaId: {
+    type: Number
+  },
   token: {
     type: String,
     unique: true,
@@ -44,6 +47,6 @@ siteSchema.virtual('siteVersions', {
   foreignField: 'siteId' // is equal to `foreignField`s
 });
 
-siteSchema.statics.publicFields = ['url', 'name', 'token'];
+siteSchema.statics.publicFields = ['url', 'name', 'token', 'yaMetrikaId'];
 
 module.exports = mongoose.model('Site', siteSchema);
