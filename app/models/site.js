@@ -25,6 +25,11 @@ const siteSchema = new mongoose.Schema({
     type: String,
     unique: true,
     required: true
+  },
+  nicheId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Niche',
+    required: 'Не указана ниша'
   }
 }, {
   timestamps: true,
@@ -47,6 +52,6 @@ siteSchema.virtual('siteVersions', {
   foreignField: 'siteId' // is equal to `foreignField`s
 });
 
-siteSchema.statics.publicFields = ['url', 'name', 'token', 'yaMetrikaId'];
+siteSchema.statics.publicFields = ['url', 'name', 'token', 'yaMetrikaId', 'nicheId'];
 
 module.exports = mongoose.model('Site', siteSchema);
