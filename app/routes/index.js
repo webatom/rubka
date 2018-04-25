@@ -4,12 +4,23 @@ const {getAllSites, getSiteById, createSite, updateSite, removeSite, getSiteVers
   getAllSiteVersions, getSiteVersionById, createSiteVersion, updateSiteVersion, removeSiteVersion,
   getAllSiteElements, getSiteElementById, createSiteElement, updateSiteElement, removeSiteElement, saveSiteElements } =
   require('../controllers/apiController');
+const {getNichesWithSites, getAllCities, getCityById, getAllNiches, getNicheById, createNiche, updateNiche, removeNiche} = require('../controllers/apiController1')
 
 const router = new Router({
   prefix: '/api'
 });
 /* eslint-disable no-multi-spaces */
 router
+  // .get('/test',                               test)
+  .get('/cities',                             getAllCities)
+  .get('/cities/:city/id',                    getCityById)
+  // niches
+  .get('/niches',                             getAllNiches)
+  .get('/niches/:nicheId',                    getNicheById)
+  .post('/niches/',                           KoaBody(), createNiche)
+  .patch('/niches/:nicheId',                  KoaBody(), updateNiche)
+  .delete('/niches/:nicheId',                 removeNiche)
+  .get('/nichesWithSites',                    getNichesWithSites)
   // sites
   .get('/sites',                              getAllSites)
   .get('/sites/:siteId',                      getSiteById)

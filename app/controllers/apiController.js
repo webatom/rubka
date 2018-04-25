@@ -3,6 +3,7 @@ const pick = require('lodash/pick');
 const crypto = require('crypto');
 const util = require('util');
 const randomBytes = util.promisify(crypto.randomBytes);
+const fs = require('fs');
 
 // const User = require('../models/user');
 const Site = require('../models/site');

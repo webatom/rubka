@@ -1,10 +1,10 @@
 const mongoose = require('mongoose');
 
-// uniqueValidator validation is not atomic! unsafe!
 const nicheSchema = new mongoose.Schema({
   title: {
     type: String,
-    required: 'У ниши должно быть название'
+    required: 'У ниши должно быть название',
+    unique: 'Название ниши должно быть уникальным'
   }
 }, {
   toObject: {
