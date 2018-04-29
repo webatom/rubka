@@ -4,22 +4,11 @@ const siteSchema = new mongoose.Schema({
   url: {
     type: String,
     required: 'Url сайта не должен быть пустым.',
-    // validate: [
-    //   {
-    //     validator(value) {
-    //       return /^[-.\w]+@([\w-]+\.)+[\w-]{2,12}$/.test(value);
-    //     },
-    //     msg:       'Некорректный email.'
-    //   }
-    // ],
     unique: 'Сайт с таким url уже существует'
   },
   name: {
     type: String,
     required: 'У сайта должно быть название'
-  },
-  yaMetrikaId: {
-    type: Number
   },
   token: {
     type: String,
@@ -51,8 +40,8 @@ siteSchema.virtual('siteElements', {
   localField: '_id', // Find people where `localField`
   foreignField: 'siteId' // is equal to `foreignField`s
 });
-siteSchema.virtual('siteVersions', {
-  ref: 'SiteVersion', // The model to use
+siteSchema.virtual('siteScripts', {
+  ref: 'SiteScript', // The model to use
   localField: '_id', // Find people where `localField`
   foreignField: 'siteId' // is equal to `foreignField`s
 });
