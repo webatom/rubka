@@ -1,26 +1,23 @@
 const mongoose = require('mongoose');
 
 // uniqueValidator validation is not atomic! unsafe!
-const elementValueSchema = new mongoose.Schema({
+const siteElementValueSchema = new mongoose.Schema({
   value: {
     type: String,
     required: 'У элемента должно быть название'
   },
-  siteVersionId: {
+  siteElementId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'SiteVersion'
+    ref: 'SiteEmelent',
+    required: 'Неуказан id эклемента'
+  },
+  siteScriptId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'SiteScript',
+    required: 'Неуказан сценарий'
   }
-}, {
-  /* @see mongoose
-  toObject: {
-    transform(doc, ret) {
-      // remove the __v of every document before returning the result
-      delete ret.__v;
-      return ret;
-    }
-  } */
 });
 
-elementValueSchema.statics.publicFields = ['value', 'siteVersionId'];
+siteElementValueSchema.statics.publicFields = ['value', 'siteElementId', 'siteScriptId'];
 
-module.exports = mongoose.model('SiteElement', elementValueSchema);
+module.exports = mongoose.model('SiteElementValue', elementValueSchema);
