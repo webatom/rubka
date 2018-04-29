@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 
-// uniqueValidator validation is not atomic! unsafe!
 const siteScriptSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -14,7 +13,7 @@ const siteScriptSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Site'
   },
-  status: {
+  isActive: {
     type: Boolean,
     default: false
   }
@@ -24,6 +23,6 @@ const siteScriptSchema = new mongoose.Schema({
   }
 });
 
-siteScriptSchema.statics.publicFields = ['name', 'utm_term', 'siteId', 'status'];
+siteScriptSchema.statics.publicFields = ['name', 'utm_term', 'siteId', 'isActive'];
 
 module.exports = mongoose.model('SiteScript', siteScriptSchema);

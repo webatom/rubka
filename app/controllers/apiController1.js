@@ -73,10 +73,10 @@ async function loadNicheById(ctx) {
   }
 }
 
-async function getCiteNameById(id) {
-  let name = await City.findById(id).select('name');
-  return name;
-}
+// async function getCiteNameById(id) {
+//   let name = await City.findById(id).select('name');
+//   return name;
+// }
 
 async function getNichesWithSites(ctx, next) {
   let niches = await Niche.find({}).populate('sites');

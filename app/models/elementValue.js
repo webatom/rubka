@@ -20,4 +20,4 @@ const siteElementValueSchema = new mongoose.Schema({
 
 siteElementValueSchema.statics.publicFields = ['value', 'siteElementId', 'siteScriptId'];
 
-module.exports = mongoose.model('SiteElementValue', elementValueSchema);
+module.exports = mongoose.model('SiteElementValue', siteElementValueSchema);

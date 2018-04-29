@@ -3,11 +3,11 @@ const pick = require('lodash/pick');
 const crypto = require('crypto');
 const util = require('util');
 const randomBytes = util.promisify(crypto.randomBytes);
-const fs = require('fs');
+// const fs = require('fs');
 
 // const User = require('../models/user');
 const Site = require('../models/site');
-const SiteVersion = require('../models/siteVersion');
+const SiteScript = require('../models/siteScript');
 const SiteElement = require('../models/siteElement');
 
 // ============== SITES ====================
@@ -59,17 +59,17 @@ async function removeSite(ctx, next) {
   await next();
 }
 
-async function getSiteVersionsBySite(ctx, next) {
+async function getSiteScriptsBySite(ctx, next) {
   if (!mongoose.Types.ObjectId.isValid(ctx.params.siteId)) {
     ctx.throw(404);
   }
-  let siteVersions = await Site.findById(ctx.params.siteId).populate('siteVersions');
+  let siteScripts = await Site.findById(ctx.params.siteId).populate('siteScripts');
 
-  if (!siteVersions) {
+  if (!siteScripts) {
     ctx.throw(404);
   }
 
-  ctx.body = siteVersions.toJSON().siteVersions;
+  ctx.body = siteScripts.toJSON().siteScripts;
 
   await next();
 }
@@ -127,49 +127,49 @@ async function saveSiteElements(ctx, next) {
   await next();
 }
 
-// ============== SITE VERSIONS ====================
-async function loadSiteVersionById(ctx) {
-  if (!mongoose.Types.ObjectId.isValid(ctx.params.siteVersionId)) {
+// ============== SITE SCRIPTS ====================
+async function loadSiteScriptById(ctx) {
+  if (!mongoose.Types.ObjectId.isValid(ctx.params.siteScriptId)) {
     ctx.throw(404);
   }
-  ctx.siteVersionById = await SiteVersion.findById(ctx.params.siteVersionId);
+  ctx.siteScriptById = await SiteScript.findById(ctx.params.siteScriptId);
 
-  if (!ctx.siteVersionById) {
+  if (!ctx.siteScriptById) {
     ctx.throw(404);
   }
 }
 
-async function getAllSiteVersions(ctx, next) {
-  let siteVersions = await SiteVersion.find({});
+async function getAllSiteScripts(ctx, next) {
+  let siteScripts = await SiteScript.find({});
   ctx.status = 200;
-  ctx.body = siteVersions.map(sv => sv.toObject());
+  ctx.body = siteScripts.map(sv => sv.toObject());
   await next();
 }
 
-async function getSiteVersionById(ctx, next) {
-  await loadSiteVersionById(ctx);
-  ctx.body = ctx.siteVersionById.toObject();
+async function getSiteScriptById(ctx, next) {
+  await loadSiteScriptById(ctx);
+  ctx.body = ctx.siteScriptById.toObject();
   await next();
 }
 
-async function createSiteVersion(ctx, next) {
-  let siteVersion = await SiteVersion.create(pick(ctx.request.body, SiteVersion.publicFields));
-  ctx.body = siteVersion.toObject();
+async function createSiteScript(ctx, next) {
+  let siteScript = await SiteScript.create(pick(ctx.request.body, SiteScript.publicFields));
+  ctx.body = siteScript.toObject();
   ctx.status = 201;
   await next();
 }
 
-async function updateSiteVersion(ctx, next) {
-  await loadSiteVersionById(ctx);
-  Object.assign(ctx.siteVersionById, pick(ctx.request.body, SiteVersion.publicFields));
-  await ctx.siteVersionById.save();
-  ctx.body = ctx.siteVersionById.toObject();
+async function updateSiteScript(ctx, next) {
+  await loadSiteScriptById(ctx);
+  Object.assign(ctx.siteScriptById, pick(ctx.request.body, SiteScript.publicFields));
+  await ctx.siteScriptById.save();
+  ctx.body = ctx.siteScriptById.toObject();
   await next();
 }
 
-async function removeSiteVersion(ctx, next) {
-  await loadSiteVersionById(ctx);
-  await ctx.siteVersionById.remove();
+async function removeSiteScript(ctx, next) {
+  await loadSiteScriptById(ctx);
+  await ctx.siteScriptById.remove();
   ctx.status = 204;
   await next();
 }
@@ -222,4 +222,4 @@ async function removeSiteElement(ctx, next) {
   await next();
 }
 
-module.exports = {getAllSites, getSiteById, createSite, updateSite, removeSite, getSiteVersionsBySite, getSiteElementsBySite, getAllSiteVersions, getSiteVersionById, createSiteVersion, updateSiteVersion, removeSiteVersion, getAllSiteElements, getSiteElementById, createSiteElement, updateSiteElement, removeSiteElement, saveSiteElements};
+module.exports = {getAllSites, getSiteById, createSite, updateSite, removeSite, getSiteScriptsBySite, getSiteElementsBySite, getAllSiteScripts, getSiteScriptById, createSiteScript, updateSiteScript, removeSiteScript, getAllSiteElements, getSiteElementById, createSiteElement, updateSiteElement, removeSiteElement, saveSiteElements};
