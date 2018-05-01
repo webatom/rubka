@@ -9,7 +9,14 @@ const randomBytes = util.promisify(crypto.randomBytes);
 const Site = require('../models/site');
 const SiteScript = require('../models/siteScript');
 const SiteElement = require('../models/siteElement');
+const ScriptVersion = require('../models/scriptVersion');
+const SiteElementValue = require('../models/siteElementValue');
 
+async function test(ctx, next) {
+  await SiteElementValue.find({});
+  ctx.status = 200;
+  await next();
+}
 // ============== SITES ====================
 async function loadSiteById(ctx) {
   if (!mongoose.Types.ObjectId.isValid(ctx.params.siteId)) {
@@ -37,6 +44,7 @@ async function getSiteById(ctx, next) {
 
 async function createSite(ctx, next) {
   ctx.request.body.token = (await randomBytes(12)).toString('hex');
+  console.log(ctx.request.body.token);
   let site = await Site.create(pick(ctx.request.body, Site.publicFields));
   console.log(site);
   ctx.body = site.toObject();
@@ -63,13 +71,26 @@ async function getSiteScriptsBySite(ctx, next) {
   if (!mongoose.Types.ObjectId.isValid(ctx.params.siteId)) {
     ctx.throw(404);
   }
-  let siteScripts = await Site.findById(ctx.params.siteId).populate('siteScripts');
-
+  let siteScripts = await Site.findById(ctx.params.siteId).populate([{
+    path: 'siteScripts',
+    model: 'SiteScript',
+    populate: [{
+      path: 'scriptVersions',
+      populate: [{
+        path: 'elementsValue',
+        model: 'SiteElementValue'
+      }]
+    }]
+  },
+  {
+    path: 'siteElements'
+  }]);
+  console.log(siteScripts);
   if (!siteScripts) {
     ctx.throw(404);
   }
 
-  ctx.body = siteScripts.toJSON().siteScripts;
+  ctx.body = siteScripts.toObject();
 
   await next();
 }
@@ -152,8 +173,26 @@ async function getSiteScriptById(ctx, next) {
   await next();
 }
 
+async function createScriptVersion(siteScriptId, siteId) {
+  let scriptVersion = await ScriptVersion.create(pick({siteScriptId: siteScriptId}, ScriptVersion.publicFields));
+
+  let query = await SiteElement.find({'siteId': siteId});
+  let elements = query.map(e => e.toObject());
+  await console.log(elements);
+  let promises = [];
+  for (let i = 0; i < elements.length; i++) {
+    let blank = {siteElementId: elements[i].id, scriptVersionId: scriptVersion._id};
+    const orderPromise = await SiteElementValue.create(pick(blank, SiteElementValue.publicFields));
+    promises.push(orderPromise);
+  }
+  await Promise.all(promises);
+}
+
 async function createSiteScript(ctx, next) {
   let siteScript = await SiteScript.create(pick(ctx.request.body, SiteScript.publicFields));
+
+  // await ScriptVersion.create(pick({siteScriptId: siteScript._id}, ScriptVersion.publicFields));
+  await createScriptVersion(siteScript._id, ctx.request.body.siteId);
   ctx.body = siteScript.toObject();
   ctx.status = 201;
   await next();
@@ -222,4 +261,4 @@ async function removeSiteElement(ctx, next) {
   await next();
 }
 
-module.exports = {getAllSites, getSiteById, createSite, updateSite, removeSite, getSiteScriptsBySite, getSiteElementsBySite, getAllSiteScripts, getSiteScriptById, createSiteScript, updateSiteScript, removeSiteScript, getAllSiteElements, getSiteElementById, createSiteElement, updateSiteElement, removeSiteElement, saveSiteElements};
+module.exports = {test, getAllSites, getSiteById, createSite, updateSite, removeSite, getSiteScriptsBySite, getSiteElementsBySite, getAllSiteScripts, getSiteScriptById, createSiteScript, updateSiteScript, removeSiteScript, getAllSiteElements, getSiteElementById, createSiteElement, updateSiteElement, removeSiteElement, saveSiteElements};

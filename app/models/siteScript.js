@@ -3,26 +3,36 @@ const mongoose = require('mongoose');
 const siteScriptSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: 'У элемента должно быть название'
+    default: 'Новый сценарий'
   },
   utm_term: {
     type: String,
-    required: 'У элемента должена быть utm метка'
+    default: 'test'
   },
   siteId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Site'
-  },
-  isActive: {
-    type: Boolean,
-    default: false
   }
+  // scriptVersionA: {
+  //   type: mongoose.Schema.Types.ObjectId,
+  //   ref: 'ScriptVersion'
+  // },
+  // scriptVersionB: {
+  //   type: mongoose.Schema.Types.ObjectId,
+  //   ref: 'ScriptVersion'
+  // }
 }, {
   toObject: {
     virtuals: true
   }
 });
 
-siteScriptSchema.statics.publicFields = ['name', 'utm_term', 'siteId', 'isActive'];
+siteScriptSchema.virtual('scriptVersions', {
+  ref: 'ScriptVersion',
+  localField: '_id',
+  foreignField: 'siteScriptId'
+});
+
+siteScriptSchema.statics.publicFields = ['name', 'utm_term', 'siteId', 'scriptVersionA', 'scriptVersionB'];
 
 module.exports = mongoose.model('SiteScript', siteScriptSchema);

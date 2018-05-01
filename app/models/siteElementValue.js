@@ -4,20 +4,24 @@ const mongoose = require('mongoose');
 const siteElementValueSchema = new mongoose.Schema({
   value: {
     type: String,
-    required: 'У элемента должно быть название'
+    default: ''
+  },
+  isEmpty: {
+    type: Boolean,
+    default: false
   },
   siteElementId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'SiteEmelent',
     required: 'Неуказан id эклемента'
   },
-  siteScriptId: {
+  scriptVersionId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'SiteScript',
+    ref: 'ScriptVersion',
     required: 'Неуказан сценарий'
   }
 });
 
-siteElementValueSchema.statics.publicFields = ['value', 'siteElementId', 'siteScriptId'];
+siteElementValueSchema.statics.publicFields = ['value', 'siteElementId', 'isEmpty', 'scriptVersionId'];
 
 module.exports = mongoose.model('SiteElementValue', siteElementValueSchema);

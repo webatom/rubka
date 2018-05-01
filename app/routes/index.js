@@ -1,17 +1,18 @@
 const Router = require('koa-router');
 const KoaBody = require('koa-body');
-const {getAllSites, getSiteById, createSite, updateSite, removeSite, getSiteScriptsBySite, getSiteElementsBySite,
+const {test, getAllSites, getSiteById, createSite, updateSite, removeSite, getSiteScriptsBySite, getSiteElementsBySite,
   getAllSiteScripts, getSiteScriptById, createSiteScript, updateSiteScript, removeSiteScript,
   getAllSiteElements, getSiteElementById, createSiteElement, updateSiteElement, removeSiteElement, saveSiteElements } =
   require('../controllers/apiController');
 const {getNichesWithSites, getAllCities, getCityById, getAllNiches, getNicheById, createNiche, updateNiche, removeNiche} = require('../controllers/apiController1');
+// const {getAll, create} = require('../controllers/mainApi');
 
 const router = new Router({
   prefix: '/api'
 });
 /* eslint-disable no-multi-spaces */
 router
-  // .get('/test',                               test)
+  .get('/test',                               test)
   .get('/cities',                             getAllCities)
   .get('/cities/:city/id',                    getCityById)
   // niches
