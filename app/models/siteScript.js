@@ -13,14 +13,6 @@ const siteScriptSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Site'
   }
-  // scriptVersionA: {
-  //   type: mongoose.Schema.Types.ObjectId,
-  //   ref: 'ScriptVersion'
-  // },
-  // scriptVersionB: {
-  //   type: mongoose.Schema.Types.ObjectId,
-  //   ref: 'ScriptVersion'
-  // }
 }, {
   toObject: {
     virtuals: true

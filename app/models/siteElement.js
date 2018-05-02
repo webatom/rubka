@@ -12,20 +12,13 @@ const siteElementSchema = new mongoose.Schema({
   },
   siteId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Site'
+    ref: 'Site',
+    required: 'Не указан сайт'
   }
 }, {
   toObject: {
     virtuals: true
   }
-  /* @see mongoose
-  toObject: {
-    transform(doc, ret) {
-      // remove the __v of every document before returning the result
-      delete ret.__v;
-      return ret;
-    }
-  } */
 });
 
 siteElementSchema.statics.publicFields = ['name', 'keyName', 'siteId'];
