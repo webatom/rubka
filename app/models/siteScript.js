@@ -25,6 +25,6 @@ siteScriptSchema.virtual('scriptVersions', {
   foreignField: 'siteScriptId'
 });
 
-siteScriptSchema.statics.publicFields = ['name', 'utm_term', 'siteId', 'scriptVersionA', 'scriptVersionB'];
+siteScriptSchema.statics.publicFields = ['name', 'utm_term', 'siteId'];
 
 module.exports = mongoose.model('SiteScript', siteScriptSchema);

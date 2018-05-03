@@ -12,13 +12,17 @@ const siteElementValueSchema = new mongoose.Schema({
   },
   siteElementId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'SiteEmelent',
+    ref: 'SiteElement',
     required: 'Неуказан id эклемента'
   },
   scriptVersionId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'ScriptVersion',
     required: 'Неуказан сценарий'
+  }
+}, {
+  toObject: {
+    virtuals: true
   }
 });
 

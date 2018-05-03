@@ -73,19 +73,18 @@ async function getSiteScriptsBySite(ctx, next) {
   }
   let siteScripts = await Site.findById(ctx.params.siteId).populate([{
     path: 'siteScripts',
-    model: 'SiteScript',
-    populate: [{
-      path: 'scriptVersions',
-      populate: [{
-        path: 'elementsValue',
-        model: 'SiteElementValue'
-      }]
-    }]
+    model: 'SiteScript'
+    // populate: [{
+    //   path: 'scriptVersions',
+    //   populate: [{
+    //     path: 'elementsValue',
+    //     model: 'SiteElementValue'
+    //   }]
+    // }]
   },
   {
     path: 'siteElements'
   }]);
-  console.log(siteScripts);
   if (!siteScripts) {
     ctx.throw(404);
   }
@@ -126,11 +125,8 @@ async function saveSiteElements(ctx, next) {
   for (let i = 0; i < siteElements.length; i++) {
     for (let j = 0; j < inputElements.length; j++) {
       if (siteElements[i].id === inputElements[j].id) {
-        // console.log(inputElements[j]);
-        // console.log(siteElements[i]);
         let tmp = await SiteElement.findById(siteElements[i].id);
         Object.assign(tmp, pick(inputElements[j], SiteElement.publicFields));
-        // console.log(tmp);
         await tmp.save();
         await inputElements.splice(j, 1);
         break;
@@ -138,10 +134,32 @@ async function saveSiteElements(ctx, next) {
     }
   }
 
+  let query = await Site.findById(ctx.params.siteId).populate([{
+    path: 'siteScripts',
+    populate: {
+      path: 'scriptVersions',
+      select: '_id'
+    }
+  }]);
+
+  let tmp = query.toJSON().siteScripts;
+  let versions = [];
+  await tmp.map(x => versions = versions.concat(x.scriptVersions));
+  console.log(versions);
+  let promises = [];
+
   for (let i = 0; i < inputElements.length; i++) {
     console.log(inputElements[i]);
-    await SiteElement.create(pick(inputElements[i], SiteElement.publicFields));
+    let element = await SiteElement.create(pick(inputElements[i], SiteElement.publicFields));
+    for (let j = 0; j < versions.length; j++) {
+      let blank = {siteElementId: element._id, scriptVersionId: versions[j].id};
+      console.log(blank);
+      const orderPromise = SiteElementValue.create(pick(blank, SiteElementValue.publicFields));
+      promises.push(orderPromise);
+    }
   }
+
+  await Promise.all(promises);
 
   ctx.status = 201;
   // await siteElements.map(se => se.remove());
@@ -168,12 +186,28 @@ async function getAllSiteScripts(ctx, next) {
 }
 
 async function getSiteScriptById(ctx, next) {
-  await loadSiteScriptById(ctx);
-  ctx.body = ctx.siteScriptById.toObject();
+  if (!mongoose.Types.ObjectId.isValid(ctx.params.siteScriptId)) {
+    ctx.throw(404);
+  }
+  let siteScript = await SiteScript.findById(ctx.params.siteScriptId).populate([{
+    path: 'scriptVersions',
+    populate: {
+      path: 'elementsValue',
+      options: { sort: { 'siteElementId': 1 } }
+      // populate: {
+      //   path: 'siteElementId'
+      // }
+    }
+  }]);
+
+  if (!siteScript) {
+    ctx.throw(404);
+  }
+  ctx.body = siteScript.toObject();
   await next();
 }
 
-async function createScriptVersion(siteScriptId, siteId) {
+async function addScriptVersion(siteScriptId, siteId) {
   let scriptVersion = await ScriptVersion.create(pick({siteScriptId: siteScriptId}, ScriptVersion.publicFields));
 
   let query = await SiteElement.find({'siteId': siteId});
@@ -182,17 +216,20 @@ async function createScriptVersion(siteScriptId, siteId) {
   let promises = [];
   for (let i = 0; i < elements.length; i++) {
     let blank = {siteElementId: elements[i].id, scriptVersionId: scriptVersion._id};
-    const orderPromise = await SiteElementValue.create(pick(blank, SiteElementValue.publicFields));
+    // AWAIT???
+    const orderPromise = SiteElementValue.create(pick(blank, SiteElementValue.publicFields));
     promises.push(orderPromise);
   }
   await Promise.all(promises);
+
+  return scriptVersion.toObject().id;
 }
 
 async function createSiteScript(ctx, next) {
   let siteScript = await SiteScript.create(pick(ctx.request.body, SiteScript.publicFields));
 
   // await ScriptVersion.create(pick({siteScriptId: siteScript._id}, ScriptVersion.publicFields));
-  await createScriptVersion(siteScript._id, ctx.request.body.siteId);
+  await addScriptVersion(siteScript._id, ctx.request.body.siteId);
   ctx.body = siteScript.toObject();
   ctx.status = 201;
   await next();
@@ -256,9 +293,64 @@ async function updateSiteElement(ctx, next) {
 
 async function removeSiteElement(ctx, next) {
   await loadSiteElementById(ctx);
+  await deleteElementValuesBySiteElement(ctx.siteElementById._id);
   await ctx.siteElementById.remove();
   ctx.status = 204;
   await next();
 }
 
-module.exports = {test, getAllSites, getSiteById, createSite, updateSite, removeSite, getSiteScriptsBySite, getSiteElementsBySite, getAllSiteScripts, getSiteScriptById, createSiteScript, updateSiteScript, removeSiteScript, getAllSiteElements, getSiteElementById, createSiteElement, updateSiteElement, removeSiteElement, saveSiteElements};
+async function deleteElementValuesBySiteElement(siteElementId) {
+  await SiteElementValue.deleteMany({'siteElementId': siteElementId});
+}
+
+// ================== SCRIPT VERSION ===============
+
+async function loadScriptVersionById(ctx) {
+  if (!mongoose.Types.ObjectId.isValid(ctx.params.scriptVersionId)) {
+    ctx.throw(404);
+  }
+  ctx.scriptVersionById = await ScriptVersion.findById(ctx.params.scriptVersionId);
+
+  if (!ctx.scriptVersionById) {
+    ctx.throw(404);
+  }
+}
+
+async function createScriptVersion(ctx, next) {
+  let svId = await addScriptVersion(ctx.request.body.siteScriptId, ctx.request.body.siteId);
+  let res = await ScriptVersion.findById(svId).populate([{
+    path: 'elementsValue',
+    options: { sort: { 'siteElementId': 1 } }
+  }]);
+  ctx.body = res.toObject();
+  ctx.status = 201;
+  await next();
+}
+
+async function removeScriptVersion(ctx, next) {
+  await loadScriptVersionById(ctx);
+  await deleteElementsValueByScriptVersion(ctx.scriptVersionById._id);
+  await ctx.scriptVersionById.remove();
+  ctx.status = 204;
+  await next();
+}
+
+async function deleteElementsValueByScriptVersion(scriptVersionId) {
+  await SiteElementValue.deleteMany({'scriptVersionId': scriptVersionId});
+}
+
+async function updateScriptVersion(ctx, next) {
+  await loadScriptVersionById(ctx);
+  Object.assign(ctx.scriptVersionById, pick(ctx.request.body, ScriptVersion.publicFields));
+  await ctx.scriptVersionById.save();
+  console.log(ctx.request.body.elementsValue);
+  for (let i = 0; i < ctx.request.body.elementsValue.length; i++) {
+    let sev = await SiteElementValue.findById(ctx.request.body.elementsValue[i].id);
+    Object.assign(sev, pick(ctx.request.body.elementsValue[i], SiteElementValue.publicFields));
+    await sev.save();
+  }
+  ctx.body = ctx.scriptVersionById.toObject();
+  await next();
+}
+
+module.exports = {test, getAllSites, getSiteById, createSite, updateSite, removeSite, getSiteScriptsBySite, getSiteElementsBySite, getAllSiteScripts, getSiteScriptById, createSiteScript, updateSiteScript, removeSiteScript, getAllSiteElements, getSiteElementById, createSiteElement, updateSiteElement, removeSiteElement, saveSiteElements, createScriptVersion, removeScriptVersion, updateScriptVersion};

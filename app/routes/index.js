@@ -1,8 +1,8 @@
 const Router = require('koa-router');
 const KoaBody = require('koa-body');
-const {test, getAllSites, getSiteById, createSite, updateSite, removeSite, getSiteScriptsBySite, getSiteElementsBySite,
+const { getAllSites, getSiteById, createSite, updateSite, removeSite, getSiteScriptsBySite, getSiteElementsBySite,
   getAllSiteScripts, getSiteScriptById, createSiteScript, updateSiteScript, removeSiteScript,
-  getAllSiteElements, getSiteElementById, createSiteElement, updateSiteElement, removeSiteElement, saveSiteElements } =
+  getAllSiteElements, getSiteElementById, createSiteElement, updateSiteElement, removeSiteElement, saveSiteElements, createScriptVersion, removeScriptVersion, updateScriptVersion } =
   require('../controllers/apiController');
 const {getNichesWithSites, getAllCities, getCityById, getAllNiches, getNicheById, createNiche, updateNiche, removeNiche} = require('../controllers/apiController1');
 // const {getAll, create} = require('../controllers/mainApi');
@@ -12,7 +12,7 @@ const router = new Router({
 });
 /* eslint-disable no-multi-spaces */
 router
-  .get('/test',                               test)
+  // .get('/test',                               test)
   .get('/cities',                             getAllCities)
   .get('/cities/:city/id',                    getCityById)
   // niches
@@ -37,6 +37,9 @@ router
   .post('/siteScripts/',                     KoaBody(), createSiteScript)
   .patch('/siteScripts/:siteScriptId',      KoaBody(), updateSiteScript)
   .delete('/siteScripts/:siteScriptId',     removeSiteScript)
+  .post('/scriptVersions/',                    KoaBody(), createScriptVersion)
+  .delete('/scriptVersions/:scriptVersionId', removeScriptVersion)
+  .patch('/scriptVersions/:scriptVersionId',  KoaBody(), updateScriptVersion)
   // site elements
   .get('/siteElements',                       getAllSiteElements)
   .get('/siteElements/:siteElementId',        getSiteElementById)
