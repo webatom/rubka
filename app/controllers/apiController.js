@@ -62,6 +62,10 @@ async function updateSite(ctx, next) {
 
 async function removeSite(ctx, next) {
   await loadSiteById(ctx);
+  console.log(ctx.siteById._id);
+  // TODO remove sitescripts and siteelements
+  // let query = SiteScript.find({'siteId': ctx.siteById._id});
+  // console.log(query);
   await ctx.siteById.remove();
   ctx.status = 204;
   await next();
@@ -243,8 +247,13 @@ async function updateSiteScript(ctx, next) {
   await next();
 }
 
+async function deleteScriptVersionsBySiteScript(siteScriptId) {
+  await ScriptVersion.deleteMany({'siteScriptId': siteScriptId});
+}
+
 async function removeSiteScript(ctx, next) {
   await loadSiteScriptById(ctx);
+  await deleteScriptVersionsBySiteScript(ctx.loadSiteScriptById.id);
   await ctx.siteScriptById.remove();
   ctx.status = 204;
   await next();

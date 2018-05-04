@@ -19,7 +19,8 @@
     "lodash": "^4.17.5",
     "mongoose": "^5.0.4",
     "mongoose-beautiful-unique-validation": "^7.0.0",
-    "optimist": "*"
+    "optimist": "*",
+    "yandex-metrika": "^0.1.2-beta"
   },
   "devDependencies": {
     "eslint": "^4.18.2",

@@ -6,15 +6,19 @@ const { getAllSites, getSiteById, createSite, updateSite, removeSite, getSiteScr
   require('../controllers/apiController');
 const {getNichesWithSites, getAllCities, getCityById, getAllNiches, getNicheById, createNiche, updateNiche, removeNiche} = require('../controllers/apiController1');
 // const {getAll, create} = require('../controllers/mainApi');
+const {getInfo} = require('../controllers/openApiController');
+const {getStatisticBySite} = require('../controllers/yaMetrikaApi');
 
 const router = new Router({
   prefix: '/api'
 });
 /* eslint-disable no-multi-spaces */
 router
+  .get('/o',                                  getInfo)
+  .get('/getStatistic',                       getStatisticBySite)
   // .get('/test',                               test)
   .get('/cities',                             getAllCities)
-  .get('/cities/:city/id',                    getCityById)
+  .get('/cities/:cityId',                    getCityById)
   // niches
   .get('/niches',                             getAllNiches)
   .get('/niches/:nicheId',                    getNicheById)
