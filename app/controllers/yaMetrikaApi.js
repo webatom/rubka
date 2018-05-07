@@ -12,7 +12,6 @@ async function getCounterId(ctx) {
   }
 
   ctx.couterId = await Site.findById(ctx.request.query.siteId).select('idYaMetrika');
-  console.log(ctx.couterId);
 
   if (!ctx.couterId) {
     ctx.throw(404);
@@ -32,7 +31,7 @@ async function getStatisticBySite(ctx, next) {
     'sort': 'ym:s:date',
     'include_undefined': 'true'
   });
-  console.log(query);
+  // console.log(query);
   ctx.body = query.data;
   next();
 }

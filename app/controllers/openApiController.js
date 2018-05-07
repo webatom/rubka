@@ -1,5 +1,5 @@
 const Site = require('../models/site');
-// const SiteElement = require('../models/siteElement');
+const ScriptVersion = require('../models/scriptVersion');
 
 class Res {
   constructor(keyName, value) {
@@ -8,33 +8,51 @@ class Res {
   }
 }
 
-async function getInfo(ctx, next) {
+/**
+ * Возвращает список элементов по token и utm_term
+ * @param  {ctx.request.query.token} token  token - уникальный идентификатор сайта
+ * @param  {ctx.request.query.utm_term} utm_tern  utm-метка (идентификатор сценария)
+ * @return {res} массив элементов с keyName и value
+ */
+async function getContent(ctx, next) {
   // ctx.request.query.token ctx.request.query.utm_term
-  let site = await Site.findOne({'token': ctx.request.query.token}).populate([{
+  let query = await Site.findOne({'token': ctx.request.query.token}).populate([{
     path: 'siteScripts',
-    match: {utm_term: ctx.request.query.utm_term},
-    // where: {'utm_term': ctx.request.query.utm_term},
-    populate: [{
-      path: 'scriptVersions',
-      populate: [{
-        path: 'elementsValue',
-        populate: {
-          path: 'siteElementId',
-          select: 'keyName'
-        }
-      }]
-    }]
+    match: {utm_term: ctx.request.query.utm_term}
   }]);
-  let res = [];
-  if (!site) {
+
+  if (!query || !query.toObject().siteScripts[0]) {
     ctx.throw(404);
   }
-  let values = site.toObject().siteScripts[0].scriptVersions[0].elementsValue;
-  for (let i = 0; i < values.length; i++) {
-    res.push(new Res(values[i].siteElementId.keyName, values[i].value));
+
+  let siteScript = query.toObject().siteScripts[0];
+
+  query = await ScriptVersion.findOne({'siteScriptId': siteScript.id, 'isActive': true}).populate([{
+    path: 'elementsValue',
+    populate: {
+      path: 'siteElementId'
+    }
+  }]);
+
+  if (!query) {
+    ctx.throw(404);
   }
+
+  let res = [];
+  let values = query.toObject().elementsValue;
+  for (let i = 0; i < values.length; i++) {
+    if (values[i].isEmpty) {
+      res.push(new Res(values[i].siteElementId.keyName, ''));
+    } else {
+      if (values[i].value == '') {
+        continue;
+      }
+      res.push(new Res(values[i].siteElementId.keyName, values[i].value));
+    }
+  }
+
   ctx.body = res;
   next();
 }
 
-module.exports = {getInfo};
+module.exports = {getContent};

@@ -6,7 +6,7 @@ const { getAllSites, getSiteById, createSite, updateSite, removeSite, getSiteScr
   require('../controllers/apiController');
 const {getNichesWithSites, getAllCities, getCityById, getAllNiches, getNicheById, createNiche, updateNiche, removeNiche} = require('../controllers/apiController1');
 // const {getAll, create} = require('../controllers/mainApi');
-const {getInfo} = require('../controllers/openApiController');
+const {getContent} = require('../controllers/openApiController');
 const {getStatisticBySite} = require('../controllers/yaMetrikaApi');
 
 const router = new Router({
@@ -14,11 +14,11 @@ const router = new Router({
 });
 /* eslint-disable no-multi-spaces */
 router
-  .get('/o',                                  getInfo)
+  .get('/o',                                  getContent)
   .get('/getStatistic',                       getStatisticBySite)
   // .get('/test',                               test)
   .get('/cities',                             getAllCities)
-  .get('/cities/:cityId',                    getCityById)
+  .get('/cities/:cityId',                     getCityById)
   // niches
   .get('/niches',                             getAllNiches)
   .get('/niches/:nicheId',                    getNicheById)
@@ -32,16 +32,17 @@ router
   .post('/sites/',                            KoaBody(), createSite)
   .patch('/sites/:siteId',                    KoaBody(), updateSite)
   .delete('/sites/:siteId',                   removeSite)
-  .get('/sites/:siteId/siteScripts',         KoaBody(), getSiteScriptsBySite)
+  .get('/sites/:siteId/siteScripts',          KoaBody(), getSiteScriptsBySite)
   .get('/sites/:siteId/siteElements',         KoaBody(), getSiteElementsBySite)
-  .post('/sites/:siteId/saveSiteElements/',    KoaBody(), saveSiteElements)
+  .post('/sites/:siteId/saveSiteElements/',   KoaBody(), saveSiteElements)
   // site Scripts
-  .get('/siteScripts',                       getAllSiteScripts)
-  .get('/siteScripts/:siteScriptId',        getSiteScriptById)
-  .post('/siteScripts/',                     KoaBody(), createSiteScript)
-  .patch('/siteScripts/:siteScriptId',      KoaBody(), updateSiteScript)
-  .delete('/siteScripts/:siteScriptId',     removeSiteScript)
-  .post('/scriptVersions/',                    KoaBody(), createScriptVersion)
+  .get('/siteScripts',                        getAllSiteScripts)
+  .get('/siteScripts/:siteScriptId',          getSiteScriptById)
+  .post('/siteScripts/',                      KoaBody(), createSiteScript)
+  .patch('/siteScripts/:siteScriptId',        KoaBody(), updateSiteScript)
+  .delete('/siteScripts/:siteScriptId',       removeSiteScript)
+  // scriptVersion
+  .post('/scriptVersions/',                   KoaBody(), createScriptVersion)
   .delete('/scriptVersions/:scriptVersionId', removeScriptVersion)
   .patch('/scriptVersions/:scriptVersionId',  KoaBody(), updateScriptVersion)
   // site elements
