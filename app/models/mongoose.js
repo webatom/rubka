@@ -7,7 +7,7 @@ const beautifyUnique = require('mongoose-beautiful-unique-validation');
 // вместо MongoError будет выдавать ValidationError (проще ловить и выводить)
 mongoose.plugin(beautifyUnique);
 // выводит все запросы в консоль
-mongoose.set('debug', true);
+// mongoose.set('debug', true);
 
 mongoose.plugin(schema => {
   if (!schema.options.toObject) {
