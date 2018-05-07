@@ -3,8 +3,8 @@ const mongoose = require('../models/mongoose');
 
 const YMetrikaRequest = require('yandex-metrika');
 // TODO получать его тоже
-// const oauthToken = process.env.oauthYandexToken;
-const oauthToken = '';
+const oauthToken = process.env.oauthYandexToken;
+// const oauthToken = '';
 const api = new YMetrikaRequest(oauthToken);
 
 async function getCounterId(ctx) {
