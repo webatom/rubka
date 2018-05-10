@@ -44,9 +44,7 @@ async function getSiteById(ctx, next) {
 
 async function createSite(ctx, next) {
   ctx.request.body.token = (await randomBytes(12)).toString('hex');
-  console.log(ctx.request.body.token);
   let site = await Site.create(pick(ctx.request.body, Site.publicFields));
-  console.log(site);
   ctx.body = site.toObject();
   ctx.status = 201;
   await next();

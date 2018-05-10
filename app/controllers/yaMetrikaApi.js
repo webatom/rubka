@@ -2,9 +2,8 @@ const Site = require('../models/site');
 const mongoose = require('../models/mongoose');
 
 const YMetrikaRequest = require('yandex-metrika');
-// TODO получать его тоже
 const oauthToken = process.env.oauthYandexToken;
-// const oauthToken = '';
+// AQAAAAAmcFxKAATo5lL-0y7rgE-djM-RFArj7T0';
 const api = new YMetrikaRequest(oauthToken);
 
 async function getCounterId(ctx) {
@@ -21,7 +20,6 @@ async function getCounterId(ctx) {
 
 async function getStatisticBySite(ctx, next) {
   await getCounterId(ctx);
-  // ctx.body = await api.get(`/management/v1/counter/${ctx.couterId.idYaMetrika}`);
   let query = await api.get('/stat/v1/data', {
     'ids': ctx.couterId.idYaMetrika,
     'metrics': 'ym:s:pageviews,ym:s:newUsers',
@@ -32,7 +30,7 @@ async function getStatisticBySite(ctx, next) {
     'sort': 'ym:s:date',
     'include_undefined': 'true'
   });
-  // console.log(query);
+  console.log(query);
   ctx.body = query.data;
   next();
 }
