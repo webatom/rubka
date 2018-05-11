@@ -20,6 +20,9 @@
     "mongoose": "^5.0.4",
     "mongoose-beautiful-unique-validation": "^7.0.0",
     "optimist": "*",
+    "request": "^2.85.0",
+    "request-promise": "^4.2.2",
+    "requestify": "^0.2.5",
     "yandex-metrika": "^0.1.2-beta"
   },
   "devDependencies": {

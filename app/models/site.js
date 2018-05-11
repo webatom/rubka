@@ -27,6 +27,9 @@ const siteSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'City',
     required: 'Не указан город'
+  },
+  oauthToken: {
+    type: 'String'
   }
 }, {
   timestamps: true,
