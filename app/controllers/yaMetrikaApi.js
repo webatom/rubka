@@ -3,6 +3,7 @@ const mongoose = require('../models/mongoose');
 const rp = require('request-promise');
 
 const YMetrikaRequest = require('yandex-metrika');
+const ApiDirect = require('./YandexDirect');
 // const oauthToken = process.env.oauthYandexToken;
 const oauthToken = 'AQAAAAAmcFxKAATo5lL-0y7rgE-djM-RFArj7T0';
 // 'AQAAAAAmcFxKAATo5lL-0y7rgE-djM-RFArj7T0';
@@ -79,5 +80,70 @@ async function setYandexToken(ctx, next) {
   ctx.status = 201;
   await next();
 }
+async function loadSiteById(ctx) {
+  if (!mongoose.Types.ObjectId.isValid(ctx.params.siteId)) {
+    ctx.throw(404);
+  }
+  ctx.siteById = await Site.findById(ctx.params.siteId);
 
-module.exports = {setYandexToken, getYandexToken, getStatisticBySite};
+  if (!ctx.siteById) {
+    ctx.throw(404);
+  }
+}
+
+// async function getCompanyByToken(token) {
+//   let options = {
+//     method: 'POST',
+//     uri: 'https://api-sandbox.direct.yandex.ru/json/v5/campaigns',
+//     headers: {
+//       'Authorization': 'Bearer ' + token,
+//       'Accept-Language': 'ru',
+//       'Content-Type': 'application/json; charset=utf-8'
+//     },
+//     body: {
+//       'method': 'get',
+//       'params': {
+//         'SelectionCriteria': {},
+//         'FieldNames':
+//           ['Name', 'Id']
+//       }
+//     },
+//     json: true
+//   };
+//   let res = await rp(options);
+//   return res;
+// }
+
+async function getDirectCompany(ctx, next) {
+  await loadSiteById(ctx);
+  let apiDirect = new ApiDirect(ctx.siteById.oauthTokenYandex);
+  let res = await apiDirect.get('campaigns', {
+    'method': 'get',
+    'params': {
+      'SelectionCriteria': {},
+      'FieldNames':
+        ['Name', 'Id']
+    }
+  });
+  ctx.body = res.result.Campaigns;
+  await next();
+}
+
+async function getDirectGroups(ctx, next) {
+  await loadSiteById(ctx);
+  let apiDirect = new ApiDirect(ctx.siteById.oauthTokenYandex);
+  let res = await apiDirect.get('adgroups', {
+    'method': 'get',
+    'params': {
+      'SelectionCriteria': {'CampaignIds': [
+        ctx.siteById.directCompanyId
+      ]},
+      'FieldNames':
+        ['Name', 'Id']
+    }
+  });
+  ctx.body = res.result.AdGroups;
+  await next();
+}
+
+module.exports = {getDirectGroups, getDirectCompany, setYandexToken, getYandexToken, getStatisticBySite};

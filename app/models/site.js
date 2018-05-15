@@ -31,6 +31,9 @@ const siteSchema = new mongoose.Schema({
   oauthTokenYandex: {
     type: 'String',
     default: ''
+  },
+  directCompanyId: {
+    type: 'String'
   }
 }, {
   timestamps: true,
@@ -53,6 +56,6 @@ siteSchema.virtual('siteScripts', {
   foreignField: 'siteId' // is equal to `foreignField`s
 });
 
-siteSchema.statics.publicFields = ['url', 'name', 'token', 'idYaMetrika', 'nicheId', 'cityId', 'oauthTokenYandex'];
+siteSchema.statics.publicFields = ['url', 'name', 'token', 'idYaMetrika', 'nicheId', 'cityId', 'oauthTokenYandex', 'directCompanyId'];
 
 module.exports = mongoose.model('Site', siteSchema);
