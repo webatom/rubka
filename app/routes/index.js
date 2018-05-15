@@ -7,7 +7,7 @@ const { getAllSites, getSiteById, createSite, updateSite, removeSite, getSiteScr
 const {getNichesWithSites, getAllCities, getCityById, getAllNiches, getNicheById, createNiche, updateNiche, removeNiche} = require('../controllers/apiController1');
 // const {getAll, create} = require('../controllers/mainApi');
 const {getContent} = require('../controllers/openApiController');
-const {getYandexToken, getStatisticBySite} = require('../controllers/yaMetrikaApi');
+const {setYandexToken, getYandexToken, getStatisticBySite} = require('../controllers/yaMetrikaApi');
 
 const router = new Router({
   prefix: '/api'
@@ -17,6 +17,7 @@ router
   .get('/o',                                  getContent)
   .get('/getStatistic',                       getStatisticBySite)
   .get('/getYandexToken',                     getYandexToken)
+  .patch('/setYandexToken/:siteId',           KoaBody(), setYandexToken)
   // .get('/test',                               test)
   .get('/cities',                             getAllCities)
   .get('/cities/:cityId',                     getCityById)

@@ -28,8 +28,9 @@ const siteSchema = new mongoose.Schema({
     ref: 'City',
     required: 'Не указан город'
   },
-  oauthToken: {
-    type: 'String'
+  oauthTokenYandex: {
+    type: 'String',
+    default: ''
   }
 }, {
   timestamps: true,
@@ -52,6 +53,6 @@ siteSchema.virtual('siteScripts', {
   foreignField: 'siteId' // is equal to `foreignField`s
 });
 
-siteSchema.statics.publicFields = ['url', 'name', 'token', 'idYaMetrika', 'nicheId', 'cityId'];
+siteSchema.statics.publicFields = ['url', 'name', 'token', 'idYaMetrika', 'nicheId', 'cityId', 'oauthTokenYandex'];
 
 module.exports = mongoose.model('Site', siteSchema);

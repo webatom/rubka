@@ -64,4 +64,20 @@ async function getYandexToken(ctx, next) {
   await next();
 }
 
-module.exports = {getYandexToken, getStatisticBySite};
+async function setYandexToken(ctx, next) {
+  if (!mongoose.Types.ObjectId.isValid(ctx.params.siteId)) {
+    ctx.throw(404);
+  }
+
+  let site = await Site.findById(ctx.params.siteId);
+
+  if (!site) {
+    ctx.throw(404);
+  }
+  site.oauthTokenYandex = ctx.request.body.oauthTokenYandex;
+  await site.save();
+  ctx.status = 201;
+  await next();
+}
+
+module.exports = {setYandexToken, getYandexToken, getStatisticBySite};
