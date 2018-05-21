@@ -4,8 +4,8 @@ const rp = require('request-promise');
 
 const YMetrikaRequest = require('yandex-metrika');
 const ApiDirect = require('./YandexDirect');
-// const oauthToken = process.env.oauthYandexToken;
-const oauthToken = 'AQAAAAAmcFxKAATo5lL-0y7rgE-djM-RFArj7T0';
+const oauthToken = process.env.oauthYandexToken;
+// const oauthToken = 'AQAAAAAmcFxKAATo5lL-0y7rgE-djM-RFArj7T0';
 // 'AQAAAAAmcFxKAATo5lL-0y7rgE-djM-RFArj7T0';
 const api = new YMetrikaRequest(oauthToken);
 const clientId = '0031c3e64b3b4bbca25db4623c21834d';
@@ -19,6 +19,17 @@ async function getCounterId(ctx) {
   ctx.couterId = await Site.findById(ctx.request.query.siteId).select('idYaMetrika');
 
   if (!ctx.couterId) {
+    ctx.throw(404);
+  }
+}
+
+async function loadSiteById(ctx) {
+  if (!mongoose.Types.ObjectId.isValid(ctx.params.siteId)) {
+    ctx.throw(404);
+  }
+  ctx.siteById = await Site.findById(ctx.params.siteId);
+
+  if (!ctx.siteById) {
     ctx.throw(404);
   }
 }
@@ -80,17 +91,6 @@ async function setYandexToken(ctx, next) {
   ctx.status = 201;
   await next();
 }
-async function loadSiteById(ctx) {
-  if (!mongoose.Types.ObjectId.isValid(ctx.params.siteId)) {
-    ctx.throw(404);
-  }
-  ctx.siteById = await Site.findById(ctx.params.siteId);
-
-  if (!ctx.siteById) {
-    ctx.throw(404);
-  }
-}
-
 // async function getCompanyByToken(token) {
 //   let options = {
 //     method: 'POST',

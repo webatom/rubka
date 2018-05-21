@@ -12,6 +12,9 @@ const siteScriptSchema = new mongoose.Schema({
   siteId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Site'
+  },
+  directGroupId: {
+    type: String
   }
 }, {
   toObject: {
@@ -25,6 +28,6 @@ siteScriptSchema.virtual('scriptVersions', {
   foreignField: 'siteScriptId'
 });
 
-siteScriptSchema.statics.publicFields = ['name', 'utm_term', 'siteId'];
+siteScriptSchema.statics.publicFields = ['name', 'utm_term', 'siteId', 'directGroupId'];
 
 module.exports = mongoose.model('SiteScript', siteScriptSchema);

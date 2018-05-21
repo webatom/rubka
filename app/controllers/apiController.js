@@ -151,11 +151,11 @@ async function saveSiteElements(ctx, next) {
   let promises = [];
 
   for (let i = 0; i < inputElements.length; i++) {
-    console.log(inputElements[i]);
+    // console.log(inputElements[i]);
     let element = await SiteElement.create(pick(inputElements[i], SiteElement.publicFields));
     for (let j = 0; j < versions.length; j++) {
       let blank = {siteElementId: element._id, scriptVersionId: versions[j].id};
-      console.log(blank);
+      // console.log(blank);
       const orderPromise = SiteElementValue.create(pick(blank, SiteElementValue.publicFields));
       promises.push(orderPromise);
     }
@@ -246,12 +246,17 @@ async function updateSiteScript(ctx, next) {
 }
 
 async function deleteScriptVersionsBySiteScript(siteScriptId) {
-  await ScriptVersion.deleteMany({'siteScriptId': siteScriptId});
+  // await ScriptVersion.deleteMany({'siteScriptId': siteScriptId});
+  let rem = await ScriptVersion.find({'siteScriptId': siteScriptId});
+  for (let i = 0; i < rem.length; i++) {
+    await deleteElementsValueByScriptVersion(rem[i].id);
+    await rem[i].remove();
+  }
 }
 
 async function removeSiteScript(ctx, next) {
   await loadSiteScriptById(ctx);
-  await deleteScriptVersionsBySiteScript(ctx.loadSiteScriptById.id);
+  await deleteScriptVersionsBySiteScript(ctx.params.siteScriptId);
   await ctx.siteScriptById.remove();
   ctx.status = 204;
   await next();
@@ -336,6 +341,7 @@ async function createScriptVersion(ctx, next) {
 
 async function removeScriptVersion(ctx, next) {
   await loadScriptVersionById(ctx);
+  // OR ID OR _ID
   await deleteElementsValueByScriptVersion(ctx.scriptVersionById._id);
   await ctx.scriptVersionById.remove();
   ctx.status = 204;
@@ -350,7 +356,7 @@ async function updateScriptVersion(ctx, next) {
   await loadScriptVersionById(ctx);
   Object.assign(ctx.scriptVersionById, pick(ctx.request.body, ScriptVersion.publicFields));
   await ctx.scriptVersionById.save();
-  console.log(ctx.request.body.elementsValue);
+  // console.log(ctx.request.body.elementsValue);
   for (let i = 0; i < ctx.request.body.elementsValue.length; i++) {
     let sev = await SiteElementValue.findById(ctx.request.body.elementsValue[i].id);
     Object.assign(sev, pick(ctx.request.body.elementsValue[i], SiteElementValue.publicFields));
