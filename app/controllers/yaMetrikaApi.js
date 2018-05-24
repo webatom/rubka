@@ -1,4 +1,5 @@
 const Site = require('../models/site');
+const SiteScript = require('../models/siteScript');
 const mongoose = require('../models/mongoose');
 const rp = require('request-promise');
 
@@ -30,6 +31,17 @@ async function loadSiteById(ctx) {
   ctx.siteById = await Site.findById(ctx.params.siteId);
 
   if (!ctx.siteById) {
+    ctx.throw(404);
+  }
+}
+
+async function loadSiteScriptById(ctx) {
+  if (!mongoose.Types.ObjectId.isValid(ctx.params.siteScriptId)) {
+    ctx.throw(404);
+  }
+  ctx.siteScriptById = await SiteScript.findById(ctx.params.siteScriptId);
+
+  if (!ctx.siteScriptById) {
     ctx.throw(404);
   }
 }
@@ -146,4 +158,98 @@ async function getDirectGroups(ctx, next) {
   await next();
 }
 
-module.exports = {getDirectGroups, getDirectCompany, setYandexToken, getYandexToken, getStatisticBySite};
+async function getKeyWords(ctx, next) {
+  await loadSiteScriptById(ctx);
+  ctx.params.siteId = ctx.siteScriptById.siteId;
+  await loadSiteById(ctx);
+  let apiDirect = new ApiDirect(ctx.siteById.oauthTokenYandex);
+  let res = await apiDirect.get('keywords', {
+    'method': 'get',
+    'params': {
+      'SelectionCriteria': {'AdGroupIds': [
+        ctx.siteScriptById.directGroupId
+      ]},
+      'FieldNames':
+        ['Keyword']
+    }
+  });
+  ctx.body = res.result.Keywords;
+  await next();
+}
+
+async function getAds(ctx, next) {
+  await loadSiteScriptById(ctx);
+  ctx.params.siteId = ctx.siteScriptById.siteId;
+  await loadSiteById(ctx);
+  let apiDirect = new ApiDirect(ctx.siteById.oauthTokenYandex);
+  let res = await apiDirect.get('ads', {
+    'method': 'get',
+    'params': {
+      'SelectionCriteria': {'AdGroupIds': [
+        ctx.siteScriptById.directGroupId
+      ]},
+      'FieldNames': ['Id'],
+      'TextAdFieldNames':
+        ['Title', 'Text']
+    }
+  });
+  ctx.body = res.result.Ads;
+  await next();
+}
+
+async function setUtm(ctx, next) {
+  await loadSiteScriptById(ctx);
+  ctx.params.siteId = ctx.siteScriptById.siteId;
+  await loadSiteById(ctx);
+  let apiDirect = new ApiDirect(ctx.siteById.oauthTokenYandex);
+  let res = await apiDirect.get('ads', {
+    'method': 'get',
+    'params': {
+      'SelectionCriteria': {'AdGroupIds': [
+        ctx.siteScriptById.directGroupId
+      ]},
+      'FieldNames': ['Id'],
+      'TextAdFieldNames':
+        ['Href']
+    }
+  });
+  let updateAds = [];
+
+  for (let i = 0; i < res.result.Ads.length; i++) {
+    let href = res.result.Ads[i].TextAd.Href;
+    let params = href.split('?');
+    if (params.length <= 1) {
+      res.result.Ads[i].TextAd.Href = params[0] + '?utm_term=' + ctx.siteScriptById.utm_term;
+      updateAds.push(res.result.Ads[i]);
+    } else {
+      let utms = params[1].split('&');
+      res.result.Ads[i].TextAd.Href = params[0] + '?';
+      let flag = false;
+      for (let j = 0; j < utms.length; j++) {
+        let tmp = utms[j].split('=');
+        if (tmp[0] === 'utm_term') {
+          if (tmp[1] === ctx.siteScriptById.utm_term) {
+            flag = true;
+            break;
+          } else {
+            tmp[1] = ctx.siteScriptById.utm_term;
+          }
+        }
+        if (j === utms.length - 1) {
+          res.result.Ads[i].TextAd.Href += tmp[0] + '=' + tmp[1];
+        } else {
+          res.result.Ads[i].TextAd.Href += tmp[0] + '=' + tmp[1] + '&';
+        }
+      }
+      if (!flag) {
+        updateAds.push(res.result.Ads[i]);
+      }
+    }
+  }
+  console.log(updateAds);
+  // TODO update ads in array updateAds
+  ctx.status = 200;
+  await next();
+}
+
+module.exports = {getDirectGroups, getDirectCompany, setYandexToken, getYandexToken, getStatisticBySite, getKeyWords, getAds, setUtm};

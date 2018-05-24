@@ -7,7 +7,7 @@ class YandexDirect {
   async get(serviceName, body) {
     let options = {
       method: 'POST',
-      uri: 'https://api-sandbox.direct.yandex.ru/json/v5/' + serviceName,
+      uri: 'https://api.direct.yandex.com/json/v5/' + serviceName,
       headers: {
         'Authorization': 'Bearer ' + this.token,
         'Accept-Language': 'ru',
