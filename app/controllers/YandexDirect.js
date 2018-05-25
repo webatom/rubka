@@ -4,6 +4,7 @@ class YandexDirect {
   constructor(token) {
     this.token = token;
   }
+
   async get(serviceName, body) {
     let options = {
       method: 'POST',

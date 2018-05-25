@@ -14,7 +14,7 @@ const router = new Router({
 });
 /* eslint-disable no-multi-spaces */
 router
-  .get('/o',                                  getContent)
+  .post('/o',                                 KoaBody(), getContent)
   .get('/getStatistic',                       getStatisticBySite)
   .get('/getYandexToken',                     getYandexToken)
   .patch('/setYandexToken/:siteId',           KoaBody(), setYandexToken)

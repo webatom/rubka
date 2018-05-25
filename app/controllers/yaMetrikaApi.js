@@ -103,28 +103,6 @@ async function setYandexToken(ctx, next) {
   ctx.status = 201;
   await next();
 }
-// async function getCompanyByToken(token) {
-//   let options = {
-//     method: 'POST',
-//     uri: 'https://api-sandbox.direct.yandex.ru/json/v5/campaigns',
-//     headers: {
-//       'Authorization': 'Bearer ' + token,
-//       'Accept-Language': 'ru',
-//       'Content-Type': 'application/json; charset=utf-8'
-//     },
-//     body: {
-//       'method': 'get',
-//       'params': {
-//         'SelectionCriteria': {},
-//         'FieldNames':
-//           ['Name', 'Id']
-//       }
-//     },
-//     json: true
-//   };
-//   let res = await rp(options);
-//   return res;
-// }
 
 async function getDirectCompany(ctx, next) {
   await loadSiteById(ctx);
@@ -246,10 +224,21 @@ async function setUtm(ctx, next) {
       }
     }
   }
-  console.log(updateAds);
-  // TODO update ads in array updateAds
+  // console.log(updateAds);
+  if (updateAds.length > 0) {
+    await updateUtm(apiDirect, updateAds);
+  }
   ctx.status = 200;
   await next();
+}
+
+async function updateUtm(apiDirect, ads) {
+  await apiDirect.get('ads', {
+    'method': 'update',
+    'params': {
+      'Ads': ads
+    }
+  });
 }
 
 module.exports = {getDirectGroups, getDirectCompany, setYandexToken, getYandexToken, getStatisticBySite, getKeyWords, getAds, setUtm};

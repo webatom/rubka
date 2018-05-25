@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const random = require('mongoose-simple-random');
 
 const scriptVersionSchema = new mongoose.Schema({
   isActive: {
@@ -23,5 +24,7 @@ scriptVersionSchema.virtual('elementsValue', {
 });
 
 scriptVersionSchema.statics.publicFields = ['isActive', 'siteScriptId'];
+
+scriptVersionSchema.plugin(random);
 
 module.exports = mongoose.model('ScriptVersion', scriptVersionSchema);

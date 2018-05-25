@@ -8,17 +8,28 @@ class Res {
   }
 }
 
+function rndDataPromise(schema, conditions, fields, options) {
+  return new Promise((resolve, reject) => {
+    schema.findOneRandom(conditions, fields, options, (err, results) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(results);
+      }
+    });
+  });
+}
+
 /**
  * Возвращает список элементов по token и utm_term
- * @param  {ctx.request.query.token} token  token - уникальный идентификатор сайта
- * @param  {ctx.request.query.utm_term} utm_tern  utm-метка (идентификатор сценария)
+ * @param  {ctx.request.body.token} token  token - уникальный идентификатор сайта
+ * @param  {ctx.request.body.utm_term} utm_tern  utm-метка (идентификатор сценария)
  * @return {res} массив элементов с keyName и value
  */
 async function getContent(ctx, next) {
-  // ctx.request.query.token ctx.request.query.utm_term
-  let query = await Site.findOne({'token': ctx.request.query.token}).populate([{
+  let query = await Site.findOne({'token': ctx.request.body.token}).populate([{
     path: 'siteScripts',
-    match: {utm_term: ctx.request.query.utm_term}
+    match: {utm_term: ctx.request.body.utm_term}
   }]);
 
   if (!query || !query.toObject().siteScripts[0]) {
@@ -27,12 +38,12 @@ async function getContent(ctx, next) {
 
   let siteScript = query.toObject().siteScripts[0];
 
-  query = await ScriptVersion.findOne({'siteScriptId': siteScript.id, 'isActive': true}).populate([{
+  query = await rndDataPromise(ScriptVersion, {'siteScriptId': siteScript.id, 'isActive': true}, {}, {populate: [{
     path: 'elementsValue',
     populate: {
       path: 'siteElementId'
     }
-  }]);
+  }]});
 
   if (!query) {
     ctx.throw(404);
@@ -50,7 +61,7 @@ async function getContent(ctx, next) {
       res.push(new Res(values[i].siteElementId.keyName, values[i].value));
     }
   }
-
+  res.push(new Res('v', query.id));
   ctx.body = res;
   next();
 }
