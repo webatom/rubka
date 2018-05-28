@@ -6,6 +6,7 @@ const cors = require('@koa/cors');
 const config = require('config');
 const err = require('./helpers/error');
 const {routes, allowedMethods} = require('./routes');
+const {openRoutes, openAllowedMethods} = require('./routes/openRoutes.js');
 const app = new Koa();
 const send = require('koa-send');
 const serve = require('koa-static');
@@ -37,6 +38,8 @@ router.post('/login', KoaBody(), require('./routes/login').post);
 router.post('/logout', KoaBody(), require('./routes/logout').post);
 app.use(routes());
 app.use(allowedMethods());
+app.use(openRoutes());
+app.use(openAllowedMethods());
 
 app.use(async ctx => {
   if ('/' == ctx.path) {

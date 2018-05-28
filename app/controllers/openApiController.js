@@ -63,7 +63,7 @@ async function getContent(ctx, next) {
   }
   res.push(new Res('v', query.id));
   ctx.body = res;
-  next();
+  await next();
 }
 
 module.exports = {getContent};

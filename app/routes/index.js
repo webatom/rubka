@@ -5,17 +5,21 @@ const { getAllSites, getSiteById, createSite, updateSite, removeSite, getSiteScr
   getAllSiteElements, getSiteElementById, createSiteElement, updateSiteElement, removeSiteElement, saveSiteElements, createScriptVersion, removeScriptVersion, updateScriptVersion } =
   require('../controllers/apiController');
 const {getNichesWithSites, getAllCities, getCityById, getAllNiches, getNicheById, createNiche, updateNiche, removeNiche} = require('../controllers/apiController1');
-// const {getAll, create} = require('../controllers/mainApi');
-const {getContent} = require('../controllers/openApiController');
 const {getDirectGroups, getDirectCompany, setYandexToken, getYandexToken, getStatisticBySite, getAds, setUtm} = require('../controllers/yaMetrikaApi');
 const {register} = require('../controllers/registration');
+
+async function checkAuth(ctx, next) {
+  if (!ctx.isAuthenticated()) {
+    ctx.throw(404);
+  }
+  await next();
+}
 
 const router = new Router({
   prefix: '/api'
 });
 /* eslint-disable no-multi-spaces */
 router
-  .post('/o',                                 KoaBody(), getContent)
   .get('/getStatistic',                       getStatisticBySite)
   .get('/getYandexToken',                     getYandexToken)
   .patch('/setYandexToken/:siteId',           KoaBody(), setYandexToken)
@@ -25,7 +29,7 @@ router
   .get('/getAds/:siteScriptId',               getAds)
   .post('/setUtm/:siteScriptId',              KoaBody(), setUtm)
   // .get('/test',                               test)
-  .get('/cities',                             getAllCities)
+  .get('/cities',                             checkAuth, getAllCities)
   .get('/cities/:cityId',                     getCityById)
   // niches
   .get('/niches',                             getAllNiches)
@@ -61,6 +65,7 @@ router
   .delete('/siteElements/:siteElementId',     removeSiteElement)
   .post('/t',                                 KoaBody(), register);
 
+router.use(['/*'], checkAuth);
 /* eslint-enable */
 module.exports = {
   routes() { return router.routes(); },
