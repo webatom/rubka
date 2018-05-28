@@ -7,7 +7,7 @@ exports.post = async function(ctx, next) {
   // можно передать и функцию
   console.log('poshel login');
   await passport.authenticate('local', {
-    successRedirect: '/ku',
+    successRedirect: '/',
     failureRedirect: '/'
     // failureMessage: true // запишет сообщение об ошибке в session.messages[]
     // failureFlash: true // req.flash, better

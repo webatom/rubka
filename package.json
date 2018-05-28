@@ -20,6 +20,7 @@
     "koa-passport": "^4.1.0",
     "koa-router": ">=7.x.x",
     "koa-send": "^4.1.3",
+    "koa-session": "^5.8.1",
     "koa-session-mongoose": "^2.0.5",
     "koa-static": "^4.0.3",
     "koa-static-spa": "git+https://github.com/pedroposada/koa-static-spa.git",

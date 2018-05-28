@@ -9,5 +9,5 @@ module.exports = {
   mongodb: {
     uri: process.env.MONGODB_URI || 'mongodb://localhost/rubka_db'
   },
-  secret: 'mysecret'
+  secret: process.env.SECRET || 'mysecret'
 };

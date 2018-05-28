@@ -12,7 +12,9 @@ const serve = require('koa-static');
 const KoaBody = require('koa-body');
 
 // keys for in-koa KeyGrip cookie signing (used in session, maybe other modules)
+const session = require('koa-session');
 app.keys = [config.secret];
+app.use(session({}, app));
 
 const path = require('path');
 const fs = require('fs');
@@ -30,7 +32,7 @@ const router = new Router();
 // router.get('/', require('./routes/login').post);
 
 app.use(router.routes());
-app.use(historyApiFallback({ whiteList: ['/api', '/static', '/ku'], verbose: true, index: '/' })); // verbose: true
+app.use(historyApiFallback({ whiteList: ['/api', '/static'], verbose: true, index: '/' })); // verbose: true
 router.post('/login', KoaBody(), require('./routes/login').post);
 router.post('/logout', KoaBody(), require('./routes/logout').post);
 app.use(routes());
@@ -46,14 +48,6 @@ app.use(async ctx => {
   }
   if (/^\/static/.test(ctx.path)) {
     return send(ctx, '/dist/' + ctx.path);
-  }
-});
-
-app.use(async ctx => {
-  if ('ku' == ctx.path) {
-    if (ctx.isAuthenticated()) {
-      return send(ctx, '/dist/index.html');
-    }
   }
 });
 
