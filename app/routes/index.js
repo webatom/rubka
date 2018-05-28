@@ -7,7 +7,8 @@ const { getAllSites, getSiteById, createSite, updateSite, removeSite, getSiteScr
 const {getNichesWithSites, getAllCities, getCityById, getAllNiches, getNicheById, createNiche, updateNiche, removeNiche} = require('../controllers/apiController1');
 // const {getAll, create} = require('../controllers/mainApi');
 const {getContent} = require('../controllers/openApiController');
-const {getDirectGroups, getDirectCompany, setYandexToken, getYandexToken, getStatisticBySite, getKeyWords, getAds, setUtm} = require('../controllers/yaMetrikaApi');
+const {getDirectGroups, getDirectCompany, setYandexToken, getYandexToken, getStatisticBySite, getAds, setUtm} = require('../controllers/yaMetrikaApi');
+const {register} = require('../controllers/registration');
 
 const router = new Router({
   prefix: '/api'
@@ -20,7 +21,7 @@ router
   .patch('/setYandexToken/:siteId',           KoaBody(), setYandexToken)
   .get('/getCompany/:siteId',                 getDirectCompany)
   .get('/getDirectGroups/:siteId',            getDirectGroups)
-  .get('/getKeywords/:siteScriptId',          getKeyWords)
+  // .get('/getKeywords/:siteScriptId',          getKeyWords)
   .get('/getAds/:siteScriptId',               getAds)
   .post('/setUtm/:siteScriptId',              KoaBody(), setUtm)
   // .get('/test',                               test)
@@ -57,7 +58,8 @@ router
   .get('/siteElements/:siteElementId',        getSiteElementById)
   .post('/siteElements/',                     KoaBody(), createSiteElement)
   .patch('/siteElements/:siteElementId',      KoaBody(), updateSiteElement)
-  .delete('/siteElements/:siteElementId',     removeSiteElement);
+  .delete('/siteElements/:siteElementId',     removeSiteElement)
+  .post('/t',                                 KoaBody(), register);
 
 /* eslint-enable */
 module.exports = {

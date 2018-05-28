@@ -5,8 +5,8 @@ const rp = require('request-promise');
 
 const YMetrikaRequest = require('yandex-metrika');
 const ApiDirect = require('./YandexDirect');
-const oauthToken = process.env.oauthYandexToken;
-// const oauthToken = 'AQAAAAAmcFxKAATo5lL-0y7rgE-djM-RFArj7T0';
+// const oauthToken = process.env.oauthYandexToken;
+const oauthToken = 'AQAAAAAmcFxKAATo5tMbon0v0UzdtskD4NbykqY';
 // 'AQAAAAAmcFxKAATo5lL-0y7rgE-djM-RFArj7T0';
 const api = new YMetrikaRequest(oauthToken);
 const clientId = '0031c3e64b3b4bbca25db4623c21834d';
@@ -17,9 +17,9 @@ async function getCounterId(ctx) {
     ctx.throw(404);
   }
 
-  ctx.couterId = await Site.findById(ctx.request.query.siteId).select('idYaMetrika');
+  ctx.counterId = await Site.findById(ctx.request.query.siteId).select('idYaMetrika');
 
-  if (!ctx.couterId) {
+  if (!ctx.counterId) {
     ctx.throw(404);
   }
 }
@@ -49,14 +49,14 @@ async function loadSiteScriptById(ctx) {
 async function getStatisticBySite(ctx, next) {
   await getCounterId(ctx);
   let query = await api.get('/stat/v1/data', {
-    'ids': ctx.couterId.idYaMetrika,
-    'metrics': 'ym:s:pageviews,ym:s:newUsers',
-    'dimensions': 'ym:s:date',
+    'ids': ctx.counterId.idYaMetrika,
+    'metrics': 'ym:s:pageviews,ym:s:newUsers,ym:s:sumGoalReachesAny',
+    'dimensions': 'ym:s:date,ym:s:lastUTMTerm',
     'group': 'day',
-    'date1': '7daysAgo',
-    'date2': 'yesterday',
+    'date1': ctx.request.query.interval,
+    'date2': 'today',
     'sort': 'ym:s:date',
-    'include_undefined': 'true'
+    'include_undefined': true
   });
   console.log(query);
   ctx.body = query.data;
