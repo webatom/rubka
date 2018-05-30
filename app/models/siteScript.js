@@ -14,7 +14,8 @@ const siteScriptSchema = new mongoose.Schema({
     ref: 'Site'
   },
   directGroupId: {
-    type: String
+    type: String,
+    unique: 'Эта группа объявлений уже привязана к сценарию'
   }
 }, {
   toObject: {
