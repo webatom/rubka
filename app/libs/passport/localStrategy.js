@@ -19,7 +19,6 @@ passport.use(new LocalStrategy({
 
 // TODO: rewrite this, use async/await
 (req, email, password, done) => {
-  console.log(email);
   User.findOne({email}, (err, user) => {
     if (err) {
       return done(err);
@@ -27,7 +26,6 @@ passport.use(new LocalStrategy({
     if (!user || !user.checkPassword(password)) {
       return done(null, false, {message: 'Нет такого пользователя или пароль неверен.'});
     }
-    console.log(user);
     return done(null, user);
   });
 }
