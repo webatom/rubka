@@ -5,12 +5,12 @@ const rp = require('request-promise');
 
 const YMetrikaRequest = require('yandex-metrika');
 const ApiDirect = require('./YandexDirect');
-// const oauthToken = process.env.oauthYandexToken;
-const oauthToken = 'AQAAAAAmcFxKAATo5tMbon0v0UzdtskD4NbykqY';
+const oauthToken = process.env.oauthYandexToken;
+// const oauthToken = 'AQAAAAAmcFxKAATo5tMbon0v0UzdtskD4NbykqY';
 // 'AQAAAAAmcFxKAATo5lL-0y7rgE-djM-RFArj7T0';
 const api = new YMetrikaRequest(oauthToken);
-const clientId = '0031c3e64b3b4bbca25db4623c21834d';
-const clientSecret = '51f17b9ce02747fc94687a0efe6f69e4';
+const clientId = process.env.client_id;
+const clientSecret = process.env.clientSecret;
 
 async function getCounterId(ctx) {
   if (!mongoose.Types.ObjectId.isValid(ctx.request.query.siteId)) {

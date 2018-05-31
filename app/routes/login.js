@@ -5,7 +5,6 @@ exports.post = async function(ctx, next) {
   // запускает стратегию, станадартные опции что делать с результатом
   // опции @https://github.com/jaredhanson/passport/blob/master/lib/middleware/authenticate.js
   // можно передать и функцию
-  console.log('poshel login');
   await passport.authenticate('local', {
     successRedirect: '/',
     failureRedirect: '/'
