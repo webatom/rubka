@@ -15,7 +15,7 @@ const KoaBody = require('koa-body');
 // keys for in-koa KeyGrip cookie signing (used in session, maybe other modules)
 const session = require('koa-session');
 app.keys = [config.secret];
-// app.use(session({}, app));
+app.use(session({}, app));
 
 const path = require('path');
 const fs = require('fs');
