@@ -83,7 +83,7 @@ async function getYandexToken(ctx, next) {
   if (typeof code !== 'undefined') {
     res = await getTokenByCode(code);
   }
-  ctx.redirect('http://localhost:8080/setToken?token=' + res.access_token);
+  ctx.redirect('http://rubka.herokuapp.com/setToken?token=' + res.access_token);
   // ctx.body = res.access_token + '<script>alert(0)</script>';
   await next();
 }
